@@ -6,7 +6,6 @@ func _process(delta):
 	get_tree().paused = paused
 	if Input.is_action_just_pressed("PAUSE"):
 		paused = !paused
-		print("sgfdfg")
 	if !get_tree().root.has_focus():
 		paused = true
 	visible = paused
