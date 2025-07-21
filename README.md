@@ -1,2 +1,2 @@
-# unpolishedJam
- game for unpolished jam
+# Y
+a mining game for unpolished jam
