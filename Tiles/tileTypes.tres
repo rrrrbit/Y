@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="TileTypeDict" load_steps=12 format=3 uid="uid://c7kobcoaa8orl"]
+
+[ext_resource type="Script" uid="uid://d4mjc06h0xbk5" path="res://Scripts/TileTypeDict.gd" id="1_gp5y2"]
+[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://Scripts/TileType.gd" id="2_e27pn"]
+[ext_resource type="Resource" uid="uid://cbk1t7n654g03" path="res://Tiles/air.tres" id="3_eu2v5"]
+[ext_resource type="Resource" uid="uid://clckcmhx4jij1" path="res://Tiles/grass.tres" id="4_bfbwg"]
+[ext_resource type="Resource" uid="uid://b1lopx46ewx8y" path="res://Tiles/dirt.tres" id="5_pspbg"]
+[ext_resource type="Resource" uid="uid://b0t016vx841o5" path="res://Tiles/rock.tres" id="6_p2rjn"]
+[ext_resource type="Resource" uid="uid://b447gp03uy3v4" path="res://Tiles/denseRock.tres" id="7_nbfib"]
+[ext_resource type="Resource" uid="uid://bwyfc4n6m7vdd" path="res://Tiles/plutRock.tres" id="8_8tw28"]
+[ext_resource type="Resource" uid="uid://dkn0brnbfg6o" path="res://Tiles/tenebrite.tres" id="9_17tia"]
+[ext_resource type="Resource" uid="uid://btmb2f1465jti" path="res://Tiles/ardite.tres" id="10_bfbwg"]
+[ext_resource type="Resource" uid="uid://dl575bsh0c1sd" path="res://Tiles/iaomite.tres" id="11_pspbg"]
+
+[resource]
+script = ExtResource("1_gp5y2")
+tileTypeDict = Dictionary[String, ExtResource("2_e27pn")]({
+"air": ExtResource("3_eu2v5"),
+"ardite": ExtResource("10_bfbwg"),
+"denseRock": ExtResource("7_nbfib"),
+"dirt": ExtResource("5_pspbg"),
+"grass": ExtResource("4_bfbwg"),
+"iaomite": ExtResource("11_pspbg"),
+"plutRock": ExtResource("8_8tw28"),
+"rock": ExtResource("6_p2rjn"),
+"tenebrite": ExtResource("9_17tia")
+})
+metadata/_custom_type_script = "uid://d4mjc06h0xbk5"

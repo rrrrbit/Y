@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TileType" load_steps=2 format=3 uid="uid://dkn0brnbfg6o"]
+
+[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://Scripts/TileType.gd" id="1_0qgcu"]
+
+[resource]
+script = ExtResource("1_0qgcu")
+tileName = "tenebrite"
+hardness = 8
+atlasCoords = Array[Vector2i]([Vector2i(5, 0)])
+sourceID = 0
+altFlipH = true
+altFlipV = true
+altRotate = true
+metadata/_custom_type_script = "uid://dj2v3pkgeft60"

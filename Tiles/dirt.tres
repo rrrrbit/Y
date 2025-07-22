@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TileType" load_steps=2 format=3 uid="uid://b1lopx46ewx8y"]
+
+[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://Scripts/TileType.gd" id="1_v6im0"]
+
+[resource]
+script = ExtResource("1_v6im0")
+tileName = "dirt"
+hardness = 1
+atlasCoords = Array[Vector2i]([Vector2i(1, 0)])
+sourceID = 0
+altFlipH = true
+altFlipV = true
+altRotate = true
+metadata/_custom_type_script = "uid://dj2v3pkgeft60"

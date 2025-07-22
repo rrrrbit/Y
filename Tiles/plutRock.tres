@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TileType" load_steps=2 format=3 uid="uid://bwyfc4n6m7vdd"]
+
+[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://Scripts/TileType.gd" id="1_ntesc"]
+
+[resource]
+script = ExtResource("1_ntesc")
+tileName = "plutRock"
+hardness = 6
+atlasCoords = Array[Vector2i]([Vector2i(4, 0)])
+sourceID = 0
+altFlipH = true
+altFlipV = true
+altRotate = true
+metadata/_custom_type_script = "uid://dj2v3pkgeft60"

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TileType" load_steps=2 format=3 uid="uid://cbk1t7n654g03"]
+
+[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://Scripts/TileType.gd" id="1_y0v47"]
+
+[resource]
+script = ExtResource("1_y0v47")
+tileName = "air"
+hardness = 1
+atlasCoords = Array[Vector2i]([Vector2i(-1, -1)])
+sourceID = 0
+altFlipH = false
+altFlipV = false
+altRotate = false
+metadata/_custom_type_script = "uid://dj2v3pkgeft60"

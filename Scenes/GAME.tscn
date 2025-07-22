@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=4 uid="uid://bqjxo5v5itpvl"]
+[gd_scene load_steps=14 format=4 uid="uid://bqjxo5v5itpvl"]
 
 [ext_resource type="Script" uid="uid://ddtm3ts1xutyp" path="res://Scripts/GAME.gd" id="1_4g6ul"]
 [ext_resource type="Script" uid="uid://c75faq2n1av13" path="res://Scripts/MENU_pause.gd" id="2_pidfq"]
@@ -7,6 +7,7 @@
 [ext_resource type="TileSet" uid="uid://bpykuxvvnx386" path="res://breaking.tres" id="4_h564y"]
 [ext_resource type="TileSet" uid="uid://bh6u1u2xa8i8b" path="res://environment.tres" id="4_pidfq"]
 [ext_resource type="Script" uid="uid://dwumte3fan7t" path="res://Scripts/PLAYER.gd" id="4_vlodu"]
+[ext_resource type="Resource" uid="uid://c7kobcoaa8orl" path="res://Tiles/tileTypes.tres" id="5_2ffrh"]
 [ext_resource type="Script" uid="uid://2mrb4g5hsfv3" path="res://MapCamera2D.gd" id="5_i7y4p"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_i7y4p"]
@@ -38,10 +39,13 @@ domain_warp_fractal_type = 0
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_2lyk1"]
 noise_type = 3
-fractal_type = 2
+fractal_type = 3
 fractal_octaves = 1
+fractal_lacunarity = 0.0
+fractal_gain = 1.0
+fractal_ping_pong_strength = 3.0
 cellular_distance_function = 2
-cellular_return_type = 0
+cellular_return_type = 4
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pidfq"]
 size = Vector2(48, 48)
@@ -129,9 +133,10 @@ text = "resume"
 [node name="WORLD" type="TileMapLayer" parent="."]
 unique_name_in_owner = true
 texture_filter = 1
-tile_map_data = PackedByteArray("AAACAPv/AAAAAAAAAAADAPv/AAABAAAAAAAEAPv/AAACAAAAAAAFAPv/AAACAAEAAAAGAPv/AAADAAAAAAAHAPv/AAADAAEAAAD7/wIAAAAAAAAAAAD7/wMAAAABAAAAAAD7/wQAAAACAAAAAAD7/wUAAAADAAAAAAD8/wIAAAAAAAAAAAD8/wMAAAABAAAAAAD8/wQAAAACAAAAAAD8/wUAAAADAAAAAAD9/wIAAAAAAAAAAAD9/wMAAAABAAAAAAD9/wQAAAACAAAAAAD9/wUAAAADAAAAAAD+/wIAAAAAAAAAAAD+/wMAAAABAAAAAAD+/wQAAAACAAAAAAD+/wUAAAADAAAAAAD//wIAAAAAAAAAAAD//wMAAAABAAAAAAD//wQAAAACAAAAAAD//wUAAAADAAAAAAAAAAIAAAAAAAAAAAAAAAMAAAABAAAAAAAAAAQAAAACAAAAAAAAAAUAAAADAAAAAAABAAIAAAAAAAAAAAABAAMAAAABAAAAAAABAAQAAAACAAAAAAABAAUAAAADAAAAAAACAAIAAAAAAAAAAAACAAMAAAABAAAAAAACAAQAAAACAAAAAAACAAUAAAADAAAAAAADAAIAAAAAAAAAAAADAAMAAAABAAAAAAADAAQAAAACAAAAAAADAAUAAAADAAAAAAAEAAIAAAAAAAAAAAAEAAMAAAABAAAAAAAEAAQAAAACAAAAAAAEAAUAAAADAAAAAAAFAAIAAAAAAAAAAAAFAAMAAAABAAAAAAAFAAQAAAACAAAAAAAFAAUAAAADAAAAAAA=")
+tile_map_data = PackedByteArray("AAACAPv/AAAAAAAAAAADAPv/AAABAAAAAAAEAPv/AAACAAAAAAAFAPv/AAACAAEAAAAGAPv/AAADAAAAAAAHAPv/AAAEAAEAAAD7/wIAAAAAAAAAAAD7/wMAAAABAAAAAAD7/wQAAAACAAAAAAD7/wUAAAADAAAAAAD8/wIAAAAAAAAAAAD8/wMAAAABAAAAAAD8/wQAAAACAAAAAAD8/wUAAAADAAAAAAD9/wIAAAAAAAAAAAD9/wMAAAABAAAAAAD9/wQAAAACAAAAAAD9/wUAAAADAAAAAAD+/wIAAAAAAAAAAAD+/wMAAAABAAAAAAD+/wQAAAACAAAAAAD+/wUAAAADAAAAAAD//wIAAAAAAAAAAAD//wMAAAABAAAAAAD//wQAAAACAAAAAAD//wUAAAADAAAAAAAAAAIAAAAAAAAAAAAAAAMAAAABAAAAAAAAAAQAAAACAAAAAAAAAAUAAAADAAAAAAABAAIAAAAAAAAAAAABAAMAAAABAAAAAAABAAQAAAACAAAAAAABAAUAAAADAAAAAAACAAIAAAAAAAAAAAACAAMAAAABAAAAAAACAAQAAAACAAAAAAACAAUAAAADAAAAAAADAAIAAAAAAAAAAAADAAMAAAABAAAAAAADAAQAAAACAAAAAAADAAUAAAADAAAAAAAEAAIAAAAAAAAAAAAEAAMAAAABAAAAAAAEAAQAAAACAAAAAAAEAAUAAAADAAAAAAAFAAIAAAAAAAAAAAAFAAMAAAABAAAAAAAFAAQAAAACAAAAAAAFAAUAAAADAAAAAAAIAPv/AAAEAAAAAAAJAPv/AAAFAAAAAAA=")
 tile_set = ExtResource("4_pidfq")
 script = ExtResource("3_wvssb")
+tileTypeDict = ExtResource("5_2ffrh")
 spaghettiNoise = SubResource("FastNoiseLite_i7y4p")
 blobNoise = SubResource("FastNoiseLite_2ffrh")
 spaghettiNoise2 = SubResource("FastNoiseLite_2lyk1")

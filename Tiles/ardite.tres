@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ClusterType" load_steps=2 format=3 uid="uid://btmb2f1465jti"]
+
+[ext_resource type="Script" uid="uid://benhk3c04kgw4" path="res://Scripts/ClusterType.gd" id="1_2vdw4"]
+
+[resource]
+script = ExtResource("1_2vdw4")
+chance = 0.005
+minDepth = 8
+maxDepth = 64
+minSize = 1
+maxSize = 5
+tileName = "ardite"
+hardness = 3
+atlasCoords = Array[Vector2i]([Vector2i(2, 1)])
+sourceID = 0
+altFlipH = true
+altFlipV = true
+altRotate = true
+metadata/_custom_type_script = "uid://dj2v3pkgeft60"
