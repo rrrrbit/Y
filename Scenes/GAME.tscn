@@ -56,6 +56,7 @@ script = ExtResource("1_4g6ul")
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="HUD" type="Control" parent="CanvasLayer"]
+unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -82,6 +83,14 @@ offset_right = 463.0
 offset_bottom = 889.0
 theme_override_font_sizes/font_size = 72
 text = "switch cam"
+
+[node name="fpsText" type="RichTextLabel" parent="CanvasLayer/HUD"]
+layout_mode = 1
+offset_right = 730.0
+offset_bottom = 99.0
+theme_override_font_sizes/normal_font_size = 72
+text = "fps:"
+fit_content = true
 
 [node name="MENU_pause" type="Control" parent="CanvasLayer"]
 process_mode = 3
@@ -145,20 +154,22 @@ spaghettiNoise2 = SubResource("FastNoiseLite_2lyk1")
 texture_filter = 1
 tile_set = ExtResource("4_h564y")
 
-[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+[node name="PLAYER" type="CharacterBody2D" parent="."]
+unique_name_in_owner = true
 physics_interpolation_mode = 1
 position = Vector2(0, -182)
 script = ExtResource("4_vlodu")
 
-[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D"]
+[node name="Sprite2D" type="Sprite2D" parent="PLAYER"]
 scale = Vector2(0.375, 0.375)
 texture = ExtResource("3_vlodu")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PLAYER"]
 shape = SubResource("RectangleShape2D_pidfq")
 
-[node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
+[node name="Camera2D" type="Camera2D" parent="PLAYER"]
 z_index = 5
+process_callback = 0
 position_smoothing_enabled = true
 editor_draw_limits = true
 
