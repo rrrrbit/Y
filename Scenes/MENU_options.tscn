@@ -1,0 +1,37 @@
+[gd_scene load_steps=3 format=3 uid="uid://brxuyvh58132g"]
+
+[ext_resource type="Script" uid="uid://dfwi1ovfpir7q" path="res://Scripts/MENU_options.gd" id="1_s2gig"]
+[ext_resource type="Script" uid="uid://bap5pf7f50y1o" path="res://Scenes/btn_remapKey.gd" id="1_swt07"]
+
+[node name="root" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_s2gig")
+
+[node name="btn_remapDig" type="Button" parent="."]
+layout_mode = 0
+offset_left = 219.0
+offset_top = 236.0
+offset_right = 667.0
+offset_bottom = 343.0
+theme_override_font_sizes/font_size = 72
+toggle_mode = true
+alignment = 0
+script = ExtResource("1_swt07")
+action = "DIG"
+
+[node name="btn_back" type="Button" parent="."]
+layout_mode = 0
+offset_left = 167.0
+offset_top = 925.0
+offset_right = 615.0
+offset_bottom = 1032.0
+theme_override_font_sizes/font_size = 72
+toggle_mode = true
+text = "back
+"
+alignment = 0
+
+[connection signal="pressed" from="btn_back" to="." method="_on_btn_back_pressed"]

@@ -22,13 +22,23 @@ theme_override_font_sizes/font_size = 72
 text = "play
 "
 
+[node name="btn_options" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 754.0
+offset_top = 622.0
+offset_right = 1036.0
+offset_bottom = 729.0
+theme_override_font_sizes/font_size = 72
+text = "settings"
+
 [node name="btn_quit" type="Button" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 832.0
-offset_top = 626.0
-offset_right = 985.0
-offset_bottom = 733.0
+offset_left = 828.0
+offset_top = 756.0
+offset_right = 981.0
+offset_bottom = 863.0
 theme_override_font_sizes/font_size = 72
 text = "quit"
 
@@ -51,4 +61,5 @@ text = "loading:"
 fit_content = true
 
 [connection signal="pressed" from="btn_play" to="." method="_on_btn_play_pressed"]
+[connection signal="pressed" from="btn_options" to="." method="_on_btn_options_pressed"]
 [connection signal="pressed" from="btn_quit" to="." method="_on_btn_quit_pressed"]
