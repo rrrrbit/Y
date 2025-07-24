@@ -1,10 +1,12 @@
 extends Node2D
 	
 func _process(delta):
-	%HUD/fpsText.text = (
+	%HUD/text_stats.text = (
 		"fps: "+str(Engine.get_frames_per_second()) + "\n" + 
 		"loaded chunks: " + str(%WORLD.loadedChunks.size()) + "\n" +
-		"cached chunks: " + str(%WORLD.cachedChunks.size())
+		"cached chunks: " + str(%WORLD.cachedChunks.size()) + "\n" +
+		"tracked tile attribs: " + str(%WORLD.tileAttrib.size())
 	)
+	%HUD/text_y.text = "Y: " + str(-1-round(%WORLD.local_to_map(%PLAYER.position).y))
 	
 	

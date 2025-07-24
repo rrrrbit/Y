@@ -1,6 +1,7 @@
 extends TileMapLayer
 
 @export var tileTypeDict : TileTypeDict
+@export var noises : Dictionary[String,Noise]
 @onready var tileTypes := tileTypeDict.tileTypeDict
 
 var clusterTypes : Dictionary[String,ClusterType]
@@ -11,11 +12,14 @@ var chunkSize := Vector2i(32,32)
 
 var SEED = 0
 
+var deltaTime := 0.0
 #var generatedChunks : Array[Vector2i]
 
 var loadedChunks : Array[Vector2i]
 
 var cachedChunks : Dictionary[Vector2i,Array]
+
+@export var reservedChunks : Array[Vector2i]
 
 const LAYER_TRANSITION_WIDTH = [
 	2,
@@ -26,9 +30,6 @@ const LAYER_TRANSITION_WIDTH = [
 
 var LTW = LAYER_TRANSITION_WIDTH
 
-@export var spaghettiNoise : Noise
-@export var blobNoise : Noise
-@export var spaghettiNoise2 : Noise
 
 const CAVE_DEPTH = 16
 
@@ -106,8 +107,8 @@ func initGen():
 	var timeTaken = endTime - startTime
 	print("generation took ",timeTaken, " seconds")
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	deltaTime = delta
 	playerChunkPos = floor(%PLAYER.position/Vector2(chunkSize)/Vector2(tile_set.tile_size))
 	
 	var neighborChunks = [
@@ -123,18 +124,15 @@ func _process(delta):
 	]
 	
 	for i in loadedChunks:
-		if not neighborChunks.has(i):
+		if not neighborChunks.has(i) and not reservedChunks.has(i):
 			unloadChunk(i.x,i.y)
 	
 	for i in neighborChunks:
-		if not loadedChunks.has(i):
+		if not loadedChunks.has(i) and not reservedChunks.has(i):
 			loadChunk(i.x,i.y)
 	
 	
 	notify_runtime_tile_data_update()
-	pass
-
-func _physics_process(delta):
 	pass
 
 func returnTileAlt(flipH: bool, flipV: bool, rotate: bool):
@@ -218,20 +216,21 @@ func generate_caves(lastTargetTileType, posX, posY):
 	
 	var targetTileType = lastTargetTileType
 	
-	spaghettiNoise.seed = SEED
-	blobNoise.seed = SEED+1
+	noises["spaghetti"].seed = SEED
+	noises["blob"].seed = SEED+1
 	
 	if posY >= CAVE_DEPTH:
 		#spaghetti
-		if spaghettiNoise.get_noise_2d(posX, posY*2)*clamp(inverse_lerp(CAVE_DEPTH,CAVE_DEPTH+16,posY),0.0,1.0) > 0.95:
+		if noises["spaghetti"].get_noise_2d(posX, posY*2)*clamp(inverse_lerp(CAVE_DEPTH,CAVE_DEPTH+16,posY),0.0,1.0) > 0.95:
 			targetTileType = "air"
 		#blob
-		if blobNoise.get_noise_2d(posX, posY*2)*clamp(inverse_lerp(CAVE_DEPTH,CAVE_DEPTH+16,posY),0,1) > 0.4:
+		if noises["blob"].get_noise_2d(posX, posY*2)*clamp(inverse_lerp(CAVE_DEPTH,CAVE_DEPTH+16,posY),0,1) > 0.4:
 			targetTileType = "air"
 	
 	return targetTileType
 
 func generate_chunk(posX, posY):
+	if reservedChunks.has(Vector2i(posX,posY)):return
 	var chunkPosGlobal := Vector2i(posX*chunkSize.x, posY*chunkSize.y) 
 	
 	for x in range(chunkSize.x):
@@ -240,9 +239,9 @@ func generate_chunk(posX, posY):
 			
 			var targetTileType = generate_layer_base(currentTile.x,currentTile.y)
 			
-			spaghettiNoise2.seed = SEED+2
+			noises["spaghetti2"].seed = SEED+2
 			if targetTileType == "plutRock":
-				if spaghettiNoise2.get_noise_2d(currentTile.x, currentTile.y*1.5)*clamp(inverse_lerp(256,320,currentTile.y),0.0,1.0) > 0.9:
+				if noises["spaghetti2"].get_noise_2d(currentTile.x, currentTile.y*1.5)*clamp(inverse_lerp(256,320,currentTile.y),0.0,1.0) > 0.9:
 					targetTileType = "iaomite"
 			
 			targetTileType = generate_caves(targetTileType,currentTile.x,currentTile.y)
@@ -310,25 +309,31 @@ func digTileGlobal(globalPos: Vector2):
 
 func digTile(tilePos: Vector2i):
 	if get_cell_atlas_coords(tilePos) == -Vector2i.ONE: return
-	var tileData := get_cell_tile_data(tilePos)
-	var tileTypeName := "air"
-	if tileData:
-		tileTypeName = tileData.get_custom_data("tileTypeName")
+	var tileType = get_tile_type(tilePos)
 	
-	if not tilePos in tileAttrib:
-		tileAttrib[tilePos] = {}
-	if not "health" in tileAttrib[tilePos]:
-		tileAttrib[tilePos]["health"] = tileTypes[tileTypeName].hardness
-		
+	get_tile_attrib(tilePos,"health",tileType.hardness)	
+	
 	tileAttrib[tilePos]["health"] -= 1
 	
 	if tileAttrib[tilePos]["health"] == 0:
 		delete_tile(tilePos)
 	else:
-		var breakSpriteSelect = 15 - floor( (tileAttrib[tilePos]["health"]-1.0) / (tileTypes[tileTypeName].hardness-1.0) * 16.0 )
+		var breakSpriteSelect = 15 - floor( (tileAttrib[tilePos]["health"]-1.0) / (tileType.hardness-1.0) * 16.0 )
 		$breakingVisualLayer.set_cell(tilePos,0,Vector2i(breakSpriteSelect,0))
-		
-	
+
+func get_tile_attrib(tilePos: Vector2i, attrib: String, default):
+	if not tilePos in tileAttrib:
+		tileAttrib[tilePos] = {}
+	if not attrib in tileAttrib[tilePos]:
+		tileAttrib[tilePos][attrib] = default
+	return tileAttrib[tilePos][attrib]
+
+func get_tile_type(coords: Vector2i) -> TileType:
+	var tileData := get_cell_tile_data(coords)
+	var tileTypeName := "air"
+	if tileData:
+		tileTypeName = tileData.get_custom_data("tileTypeName")
+	return tileTypeDict.tileTypeDict[tileTypeName]
 
 func delete_tile(tilePos: Vector2i):
 	set_cell(tilePos)
@@ -336,7 +341,12 @@ func delete_tile(tilePos: Vector2i):
 	tileAttrib.erase(tilePos)
 
 func _use_tile_data_runtime_update(coords: Vector2i) -> bool:
+	if get_tile_type(coords).behavior:
+		if not coords in tileAttrib:
+			tileAttrib[coords] = {}
 	return tileAttrib.has(coords)
 
 func _tile_data_runtime_update(coords: Vector2i, tile_data: TileData) -> void:
-	print("test")
+	if get_tile_type(coords).behavior:
+		get_tile_type(coords).behavior._tick(coords,tile_data,tileAttrib[coords])
+		

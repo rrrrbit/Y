@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TileType" load_steps=2 format=3 uid="uid://cbk1t7n654g03"]
 
-[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://Scripts/TileType.gd" id="1_y0v47"]
+[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://Tiles/TileType.gd" id="1_y0v47"]
 
 [resource]
 script = ExtResource("1_y0v47")
