@@ -24,9 +24,9 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="5.6658248"
-     inkscape:cx="284.42461"
-     inkscape:cy="90.807608"
+     inkscape:zoom="2.8329124"
+     inkscape:cx="276.92349"
+     inkscape:cy="70.775221"
      inkscape:window-width="1920"
      inkscape:window-height="1051"
      inkscape:window-x="-9"
@@ -85,7 +85,7 @@
        x="33.866669"
        y="16.933332" />
     <rect
-       style="fill:#00cdf9;fill-rule:evenodd;stroke-width:4.35999;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       style="fill:#00cdf9;fill-rule:evenodd;stroke-width:4.35999;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers;fill-opacity:1"
        id="rect19"
        width="16.933332"
        height="16.933332"
@@ -576,6 +576,97 @@
        height="1.667621"
        x="79.808395"
        y="19.186417" />
+    <rect
+       style="fill:#7a09fa;fill-opacity:1;fill-rule:evenodd;stroke-width:4.35999;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect20"
+       width="16.933332"
+       height="16.933332"
+       x="84.666664"
+       y="16.933332" />
+    <rect
+       style="fill:#db3ffd;fill-opacity:1;fill-rule:evenodd;stroke-width:1.3641;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect22"
+       width="9.853302"
+       height="2.8485847"
+       x="89.598587"
+       y="18.829872" />
+    <rect
+       style="fill:#db3ffd;fill-opacity:1;fill-rule:evenodd;stroke-width:0.735808;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect25"
+       width="4.9966979"
+       height="1.6344336"
+       x="87.590561"
+       y="23.779873" />
+    <rect
+       style="fill:#db3ffd;fill-opacity:1;fill-rule:evenodd;stroke-width:1.06558;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect26"
+       width="5.5570755"
+       height="3.0820751"
+       x="86.7033"
+       y="28.869965" />
+    <rect
+       style="fill:#db3ffd;fill-opacity:1;fill-rule:evenodd;stroke-width:0.860099;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect30"
+       width="5.5570755"
+       height="2.0080185"
+       x="94.221695"
+       y="26.441666" />
+    <rect
+       style="fill:#fdd2ed;fill-opacity:1;fill-rule:evenodd;stroke-width:0.813345;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect31"
+       width="4.2403083"
+       height="2.3532763"
+       x="93.355553"
+       y="19.60537" />
+    <rect
+       style="fill:#fdd2ed;fill-opacity:1;fill-rule:evenodd;stroke-width:0.559389;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect32"
+       width="2.3331039"
+       height="2.0230708"
+       x="89.623734"
+       y="29.348623" />
+    <rect
+       style="fill:#fdd2ed;fill-opacity:1;fill-rule:evenodd;stroke-width:0.516882;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect33"
+       width="3.0820756"
+       height="1.3075469"
+       x="89.178299"
+       y="24.246855" />
+    <rect
+       style="fill:#fdd2ed;fill-opacity:1;fill-rule:evenodd;stroke-width:0.365491;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect52"
+       width="1.5410378"
+       height="1.3075469"
+       x="95.902832"
+       y="26.81525" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.161427;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect53"
+       width="0.65773797"
+       height="0.59760493"
+       x="96.513718"
+       y="27.013374" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.161427;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect54"
+       width="0.65773797"
+       height="0.59760493"
+       x="90.866707"
+       y="29.580479" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.161427;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect55"
+       width="0.65773797"
+       height="0.59760493"
+       x="91.44838"
+       y="24.444952" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke-width:0.282465;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:10000;paint-order:stroke fill markers"
+       id="rect68"
+       width="1.8134574"
+       height="0.66364604"
+       x="95.324982"
+       y="19.963486" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -686,4 +777,8 @@
        y="-13.558716"
        transform="rotate(45)" />
   </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Layer 3" />
 </svg>

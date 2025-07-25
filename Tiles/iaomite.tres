@@ -11,6 +11,6 @@ atlasCoords = Array[Vector2i]([Vector2i(4, 1)])
 sourceID = 0
 altFlipH = true
 altFlipV = true
-altRotate = true
+altRotate = false
 behaviorScript = ExtResource("1_e8lv0")
 metadata/_custom_type_script = "uid://dj2v3pkgeft60"

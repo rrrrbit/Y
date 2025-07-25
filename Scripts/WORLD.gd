@@ -4,11 +4,13 @@ extends TileMapLayer
 @export var noises : Dictionary[String,Noise]
 @onready var tileTypes := tileTypeDict.tileTypeDict
 
+@export var updateChunks := true
+@export var tickChunks := true
 var clusterTypes : Dictionary[String,ClusterType]
 
 var tileAttrib : Dictionary
 
-var chunkSize := Vector2i(32,32)
+var chunkSize := Vector2i(16,16)
 
 var SEED = 0
 
@@ -20,24 +22,26 @@ var loadedChunks : Array[Vector2i]
 var cachedChunks : Dictionary[Vector2i,Array]
 
 @export var reservedChunks : Array[Vector2i]
-
+@export var initialGenerate : Rect2i
 const LAYER_TRANSITION_WIDTH = [
 	2,
 	4,
-	8,
-	16
+	4,
+	4,
+	4
 ]
 
 var LTW = LAYER_TRANSITION_WIDTH
 
 
-const CAVE_DEPTH = 16
+const CAVE_DEPTH = 50
 
 const LAYER_BOUNDARIES = [
 	4,
-	64,
-	256,
-	512
+	250,
+	500,
+	1000,
+	1500,
 ]
 
 var playerChunkPos: Vector2i
@@ -100,8 +104,8 @@ func initGen():
 	
 	var startTime = Time.get_unix_time_from_system()
 	
-	for i in range(-1,1):
-		for j in range(-1,1):
+	for i in range(initialGenerate.position.x,initialGenerate.end.x):
+		for j in range(initialGenerate.position.y,initialGenerate.end.y):
 			generate_chunk(i,j)
 	var endTime = Time.get_unix_time_from_system()
 	var timeTaken = endTime - startTime
@@ -124,26 +128,28 @@ func _process(delta):
 	]
 	
 	for i in loadedChunks:
-		if not neighborChunks.has(i) and not reservedChunks.has(i):
+		if not neighborChunks.has(i) and not reservedChunks.has(i) and updateChunks:
 			unloadChunk(i.x,i.y)
 	
 	for i in neighborChunks:
-		if not loadedChunks.has(i) and not reservedChunks.has(i):
+		if not loadedChunks.has(i) and not reservedChunks.has(i) and updateChunks:
 			loadChunk(i.x,i.y)
 	
 	
-	notify_runtime_tile_data_update()
+	if tickChunks: notify_runtime_tile_data_update()
 	pass
 
-func returnTileAlt(flipH: bool, flipV: bool, rotate: bool):
+func returnTileAlt(flipH: bool, flipV: bool, rotate: bool, randSeed: int = randi()):
 	var alt := 0
 	if rotate:
+		seed(randSeed)
 		match randi_range(0,3):
 			1: alt = TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_H
 			2: alt = TileSetAtlasSource.TRANSFORM_FLIP_H | TileSetAtlasSource.TRANSFORM_FLIP_V
 			3: alt = TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_V
-				
+	seed(randSeed+1)
 	if flipH and randf() < 0.5: alt ^= TileSetAtlasSource.TRANSFORM_FLIP_H
+	seed(randSeed+2)
 	if flipV and randf() < 0.5: alt ^= TileSetAtlasSource.TRANSFORM_FLIP_V
 	
 	return alt
@@ -205,14 +211,22 @@ func generate_layer_base(posX, posY):
 			targetTileType = "plutRock"
 			
 	#tenebrite
-	elif LAYER_BOUNDARIES[3]+LTW[3] <= posY :#and currentTile.y < LAYER_BOUNDARIES[3] - LTW[3]:
+	elif LAYER_BOUNDARIES[3]+LTW[3] <= posY and posY < LAYER_BOUNDARIES[4] - LTW[4]:
 		targetTileType = "tenebrite"
-		
+	
+	#tenebrite - null transition 
+	elif LAYER_BOUNDARIES[4]-LTW[4] <= posY and posY < LAYER_BOUNDARIES[4]+LTW[4]:
+		seed(SEED + posX * posY)
+		if randf() < inverse_lerp(LAYER_BOUNDARIES[4]-LTW[4],LAYER_BOUNDARIES[4]+LTW[4],posY):
+			targetTileType = "air"
+		else:
+			targetTileType = "tenebrite"
+	
 	return targetTileType
 	
 func generate_caves(lastTargetTileType, posX, posY):
 	
-	if lastTargetTileType == "iaomite":return lastTargetTileType
+	if lastTargetTileType in ["iaomite","conivium"]:return lastTargetTileType
 	
 	var targetTileType = lastTargetTileType
 	
@@ -229,6 +243,19 @@ func generate_caves(lastTargetTileType, posX, posY):
 	
 	return targetTileType
 
+func generate_ores_noise(lastTargetTileType, posX, posY):
+	var targetTileType = lastTargetTileType
+	noises["spaghetti2"].seed = SEED+2
+	if targetTileType == "plutRock":
+		if noises["spaghetti2"].get_noise_2d(posX, posY*1.5)*clamp(inverse_lerp(256,320,posY),0.0,1.0) > 0.875:
+			targetTileType = "iaomite"
+			
+	noises["spaghetti3"].seed = SEED+3
+	if targetTileType == "tenebrite":
+		if noises["spaghetti3"].get_noise_2d(posX, posY) < -0.95:
+			targetTileType = "conivium"
+	return targetTileType
+
 func generate_chunk(posX, posY):
 	if reservedChunks.has(Vector2i(posX,posY)):return
 	var chunkPosGlobal := Vector2i(posX*chunkSize.x, posY*chunkSize.y) 
@@ -239,17 +266,11 @@ func generate_chunk(posX, posY):
 			
 			var targetTileType = generate_layer_base(currentTile.x,currentTile.y)
 			
-			noises["spaghetti2"].seed = SEED+2
-			if targetTileType == "plutRock":
-				if noises["spaghetti2"].get_noise_2d(currentTile.x, currentTile.y*1.5)*clamp(inverse_lerp(256,320,currentTile.y),0.0,1.0) > 0.9:
-					targetTileType = "iaomite"
+			targetTileType = generate_ores_noise(targetTileType,currentTile.x,currentTile.y)
 			
 			targetTileType = generate_caves(targetTileType,currentTile.x,currentTile.y)
 			
-			#region: generate other structures
 			
-			
-			#endregion
 			
 			if targetTileType == "air":
 				set_cell(currentTile)
@@ -311,15 +332,11 @@ func digTile(tilePos: Vector2i):
 	if get_cell_atlas_coords(tilePos) == -Vector2i.ONE: return
 	var tileType = get_tile_type(tilePos)
 	
-	get_tile_attrib(tilePos,"health",tileType.hardness)	
+	get_tile_attrib(tilePos,"health",tileType.hardness)
 	
 	tileAttrib[tilePos]["health"] -= 1
 	
-	if tileAttrib[tilePos]["health"] == 0:
-		delete_tile(tilePos)
-	else:
-		var breakSpriteSelect = 15 - floor( (tileAttrib[tilePos]["health"]-1.0) / (tileType.hardness-1.0) * 16.0 )
-		$breakingVisualLayer.set_cell(tilePos,0,Vector2i(breakSpriteSelect,0))
+	
 
 func get_tile_attrib(tilePos: Vector2i, attrib: String, default):
 	if not tilePos in tileAttrib:
@@ -347,6 +364,13 @@ func _use_tile_data_runtime_update(coords: Vector2i) -> bool:
 	return tileAttrib.has(coords)
 
 func _tile_data_runtime_update(coords: Vector2i, tile_data: TileData) -> void:
-	if get_tile_type(coords).behavior:
-		get_tile_type(coords).behavior._tick(coords,tile_data,tileAttrib[coords])
+	var tileType = get_tile_type(coords)
+	get_tile_attrib(coords,"health",tileType.hardness)
+	if tileType.behavior:
+		tileType.behavior._tick(coords,tile_data,tileAttrib[coords],deltaTime, %PLAYERCAM, self)
 		
+	if tileAttrib[coords]["health"] == 0:
+		delete_tile(coords)
+	else:
+		var breakSpriteSelect = 15 - floor( (tileAttrib[coords]["health"]-1.0) / (tileType.hardness-1.0) * 16.0 )
+		$breakingVisualLayer.set_cell(coords,1 if tileType.lightModeBreak else 0,Vector2i(breakSpriteSelect,0),returnTileAlt(true,true,true,coords.x*coords.y))

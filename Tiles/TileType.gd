@@ -8,6 +8,7 @@ class_name TileType
 @export var altFlipH := false
 @export var altFlipV := false
 @export var altRotate := false
+@export var lightModeBreak := false
 @export var behaviorScript : Script:
 	set(val):
 		behaviorScript = val

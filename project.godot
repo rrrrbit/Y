@@ -15,6 +15,7 @@ run/main_scene="uid://y3k0afdehs17"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="Y"
 config/features=PackedStringArray("4.4", "Forward Plus")
+boot_splash/bg_color=Color(0, 0, 0, 1)
 config/icon="res://icon.svg"
 
 [autoload]
@@ -26,6 +27,7 @@ GLOBAL="*res://Scripts/GLOBAL.gd"
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/size/mode=2
+window/size/sharp_corners=true
 
 [input]
 
@@ -67,3 +69,7 @@ DIG={
 [physics]
 
 2d/run_on_separate_thread=true
+
+[rendering]
+
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)

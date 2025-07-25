@@ -6,9 +6,9 @@
 script = ExtResource("1_2vdw4")
 chance = 0.005
 minDepth = 8
-maxDepth = 64
+maxDepth = 250
 minSize = 1
-maxSize = 5
+maxSize = 10
 tileName = "ardite"
 hardness = 3
 atlasCoords = Array[Vector2i]([Vector2i(2, 1)])
