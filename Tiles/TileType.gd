@@ -14,3 +14,6 @@ class_name TileType
 		behaviorScript = val
 		behavior = behaviorScript.new()
 var behavior: TileBehavior = null
+
+func _to_string():
+	return tileName

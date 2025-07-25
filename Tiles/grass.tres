@@ -11,4 +11,5 @@ sourceID = 0
 altFlipH = true
 altFlipV = false
 altRotate = false
+lightModeBreak = false
 metadata/_custom_type_script = "uid://dj2v3pkgeft60"

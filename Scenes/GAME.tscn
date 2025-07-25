@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=4 uid="uid://bqjxo5v5itpvl"]
+[gd_scene load_steps=18 format=4 uid="uid://bqjxo5v5itpvl"]
 
 [ext_resource type="Script" uid="uid://ddtm3ts1xutyp" path="res://Scripts/GAME.gd" id="1_4g6ul"]
 [ext_resource type="Script" uid="uid://c75faq2n1av13" path="res://Scripts/MENU_pause.gd" id="2_pidfq"]
@@ -11,6 +11,20 @@
 [ext_resource type="Script" uid="uid://dwumte3fan7t" path="res://Scripts/PLAYER.gd" id="4_vlodu"]
 [ext_resource type="Resource" uid="uid://c7kobcoaa8orl" path="res://Tiles/tileTypes.tres" id="5_2ffrh"]
 [ext_resource type="Script" uid="uid://2mrb4g5hsfv3" path="res://MapCamera2D.gd" id="5_i7y4p"]
+[ext_resource type="Texture2D" uid="uid://dclmwm58mnoux" path="res://tileSelect.png" id="12_l6mex"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_2ffrh"]
+noise_type = 3
+frequency = 0.05
+fractal_type = 0
+fractal_octaves = 1
+fractal_lacunarity = 2.84
+fractal_gain = -0.385
+cellular_distance_function = 2
+cellular_return_type = 3
+domain_warp_amplitude = 0.0
+domain_warp_frequency = 1.0
+domain_warp_fractal_type = 0
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_i7y4p"]
 noise_type = 3
@@ -35,19 +49,6 @@ fractal_gain = 1.0
 fractal_ping_pong_strength = 5.0
 cellular_distance_function = 2
 cellular_return_type = 4
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_2ffrh"]
-noise_type = 3
-frequency = 0.05
-fractal_type = 0
-fractal_octaves = 1
-fractal_lacunarity = 2.84
-fractal_gain = -0.385
-cellular_distance_function = 2
-cellular_return_type = 3
-domain_warp_amplitude = 0.0
-domain_warp_frequency = 1.0
-domain_warp_fractal_type = 0
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ov7xf"]
 noise_type = 2
@@ -119,6 +120,7 @@ offset_left = -365.0
 offset_right = 365.0
 offset_bottom = 99.0
 grow_horizontal = 2
+theme_override_colors/default_color = Color(1, 1, 1, 0.501961)
 theme_override_font_sizes/normal_font_size = 72
 text = "Y:0"
 fit_content = true
@@ -217,6 +219,7 @@ fit_content = true
 autowrap_mode = 0
 
 [node name="btn_remapDig" type="Button" parent="CanvasLayer/MENU_options"]
+layout_mode = 0
 offset_left = 219.0
 offset_top = 236.0
 offset_right = 667.0
@@ -228,6 +231,7 @@ script = ExtResource("3_2lyk1")
 action = "DIG"
 
 [node name="btn_back" type="Button" parent="CanvasLayer/MENU_options"]
+layout_mode = 0
 offset_left = 167.0
 offset_top = 925.0
 offset_right = 615.0
@@ -261,7 +265,6 @@ tile_set = ExtResource("4_h564y")
 [node name="PLAYER" type="CharacterBody2D" parent="."]
 unique_name_in_owner = true
 physics_interpolation_mode = 1
-position = Vector2(0, 64000)
 script = ExtResource("4_vlodu")
 
 [node name="Sprite2D" type="Sprite2D" parent="PLAYER"]
@@ -287,8 +290,9 @@ pan_speed = 1000.0
 pan_margin = 100.0
 drag_inertia = 0.0
 
-[node name="Node2D" type="Node2D" parent="."]
-position = Vector2(672, -288)
+[node name="tileSelect" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+texture = ExtResource("12_l6mex")
 
 [connection signal="pressed" from="CanvasLayer/HUD/btn_quit2" to="WORLD" method="initGen"]
 [connection signal="pressed" from="CanvasLayer/HUD/btn_quit3" to="MapCamera2D" method="toggleEnabled"]

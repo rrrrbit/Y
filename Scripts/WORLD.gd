@@ -115,17 +115,7 @@ func _process(delta):
 	deltaTime = delta
 	playerChunkPos = floor(%PLAYER.position/Vector2(chunkSize)/Vector2(tile_set.tile_size))
 	
-	var neighborChunks = [
-		Vector2i(playerChunkPos.x-1,playerChunkPos.y-1),
-		Vector2i(playerChunkPos.x,  playerChunkPos.y-1),
-		Vector2i(playerChunkPos.x+1,playerChunkPos.y-1),
-		Vector2i(playerChunkPos.x-1,playerChunkPos.y),
-		Vector2i(playerChunkPos.x,  playerChunkPos.y),
-		Vector2i(playerChunkPos.x+1,playerChunkPos.y),
-		Vector2i(playerChunkPos.x-1,playerChunkPos.y+1),
-		Vector2i(playerChunkPos.x,  playerChunkPos.y+1),
-		Vector2i(playerChunkPos.x+1,playerChunkPos.y+1),
-	]
+	var neighborChunks = GLOBAL.get_neighbors(playerChunkPos)
 	
 	for i in loadedChunks:
 		if not neighborChunks.has(i) and not reservedChunks.has(i) and updateChunks:
@@ -299,7 +289,7 @@ func place_cluster(start: Vector2i, clusterType: String):
 	
 	var size = randi_range(clusterTypeData.minSize,clusterTypeData.maxSize)
 	
-	var toProcess = [start]
+	var toProcess : Array[Vector2i] = [start]
 	var processed = {}
 	
 	while toProcess.size() > 0 and size > 0:
@@ -317,16 +307,26 @@ func place_cluster(start: Vector2i, clusterType: String):
 		processed[current] = true
 		size -= 1
 		
-		toProcess.append(current + Vector2i.LEFT)
-		toProcess.append(current + Vector2i.RIGHT)
-		toProcess.append(current + Vector2i.UP)
-		toProcess.append(current + Vector2i.DOWN)
+		toProcess.append_array(GLOBAL.get_adjacent(current))
 		
 		toProcess.shuffle()
 
-func digTileGlobal(globalPos: Vector2):
-	var tile := local_to_map(globalPos)
-	digTile(tile)
+func find_air_body(start: Vector2i, maxDistance: int):
+	var toVisit : Array[Vector2i] = [start]
+	var visited = []
+	
+	while !toVisit.is_empty():
+		var current = toVisit.pop_back()
+		
+		var distance = max((current-start).abs().x, (current-start).abs().y)
+		
+		if visited.has(current) or str(get_tile_type(current)) != "air" or distance > maxDistance:
+			continue
+			
+		visited.append(current)
+		toVisit.append_array(GLOBAL.get_adjacent(current))
+		
+	return visited
 
 func digTile(tilePos: Vector2i):
 	if get_cell_atlas_coords(tilePos) == -Vector2i.ONE: return
@@ -335,8 +335,6 @@ func digTile(tilePos: Vector2i):
 	get_tile_attrib(tilePos,"health",tileType.hardness)
 	
 	tileAttrib[tilePos]["health"] -= 1
-	
-	
 
 func get_tile_attrib(tilePos: Vector2i, attrib: String, default):
 	if not tilePos in tileAttrib:
@@ -356,6 +354,15 @@ func delete_tile(tilePos: Vector2i):
 	set_cell(tilePos)
 	$breakingVisualLayer.set_cell(tilePos)
 	tileAttrib.erase(tilePos)
+
+func is_tile_diggable(coords:Vector2i, playerCoords: Vector2i, range: int) -> bool:
+	var airBody = find_air_body(playerCoords, range)
+	var airBodyAdjacent = []
+	for tile in airBody:
+		airBodyAdjacent.append_array(GLOBAL.get_adjacent(tile))
+
+	var distance = max((coords-playerCoords).abs().x, (coords-playerCoords).abs().y)
+	return airBodyAdjacent.has(coords) and distance <= range and str(get_tile_type(coords)) != "air"
 
 func _use_tile_data_runtime_update(coords: Vector2i) -> bool:
 	if get_tile_type(coords).behavior:

@@ -28,6 +28,7 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/size/mode=2
 window/size/sharp_corners=true
+window/vsync/vsync_mode=3
 
 [input]
 

@@ -12,5 +12,6 @@ sourceID = 0
 altFlipH = true
 altFlipV = true
 altRotate = false
+lightModeBreak = false
 behaviorScript = ExtResource("1_e8lv0")
 metadata/_custom_type_script = "uid://dj2v3pkgeft60"
