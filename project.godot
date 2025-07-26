@@ -16,7 +16,7 @@ config/use_custom_user_dir=true
 config/custom_user_dir_name="Y"
 config/features=PackedStringArray("4.4", "Forward Plus")
 boot_splash/bg_color=Color(0, 0, 0, 1)
-config/icon="res://icon.svg"
+config/icon="res://Sprites/icon.svg"
 
 [autoload]
 

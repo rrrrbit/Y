@@ -6,11 +6,18 @@ extends TileMapLayer
 
 @export var updateChunks := true
 @export var tickChunks := true
+
+@onready var TILE_SIZE = tile_set.tile_size
+
+var tickingTiles := 0
+
+var lightmap: Dictionary[Vector2i,Color]
+
 var clusterTypes : Dictionary[String,ClusterType]
 
 var tileAttrib : Dictionary
 
-var chunkSize := Vector2i(16,16)
+var chunkSize := Vector2i(32,16)
 
 var SEED = 0
 
@@ -49,55 +56,14 @@ var playerChunkPos: Vector2i
 func _ready():
 	getClusterTypes()
 	initGen()
+	for i in reservedChunks:
+		loadedChunks.append(i)
 
 func getClusterTypes():
 	for tileType in tileTypes.keys():
 		if is_instance_of(tileTypes[tileType], ClusterType):
 			clusterTypes[tileType] = tileTypes[tileType]
 
-func unloadChunk(posX: int, posY: int):
-	var tilesArray = []
-	var chunkPosGlobal := Vector2i(posX*chunkSize.x, posY*chunkSize.y) 
-	for x in range(chunkSize.x):
-		for y in range(chunkSize.y):
-			var currentTile := Vector2i(x,y)+chunkPosGlobal
-			var tileData := get_cell_tile_data(currentTile)
-			var tileTypeName := "air"
-			if tileData:
-				tileTypeName = tileData.get_custom_data("tileTypeName")
-			tilesArray.append(tileTypeName)
-			delete_tile(currentTile)
-	
-	cachedChunks[Vector2i(posX,posY)] = tilesArray
-	loadedChunks.erase(Vector2i(posX,posY))
-
-func loadChunk(posX: int, posY: int):
-	if not cachedChunks.has(Vector2i(posX,posY)):
-		generate_chunk(posX,posY)
-		return
-	var chunkState = cachedChunks[Vector2i(posX,posY)]
-	
-	var chunkPosGlobal := Vector2i(posX*chunkSize.x, posY*chunkSize.y) 
-	for x in range(chunkSize.x):
-		for y in range(chunkSize.y):
-			var currentTile := Vector2i(x,y)+chunkPosGlobal
-			var targetTileType : String = chunkState.pop_front()
-			
-			if targetTileType == "air":
-				set_cell(currentTile)
-			else:
-				set_cell(currentTile,
-					tileTypes[targetTileType].sourceID,
-					tileTypes[targetTileType].atlasCoords[0],
-					returnTileAlt(
-						tileTypes[targetTileType].altFlipH,
-						tileTypes[targetTileType].altFlipV,
-						tileTypes[targetTileType].altRotate
-						))
-						
-	cachedChunks.erase(Vector2i(posX,posY))
-	loadedChunks.append(Vector2i(posX,posY))
-	
 func initGen():
 	SEED = randi()
 	tileAttrib.clear()
@@ -107,42 +73,9 @@ func initGen():
 	for i in range(initialGenerate.position.x,initialGenerate.end.x):
 		for j in range(initialGenerate.position.y,initialGenerate.end.y):
 			generate_chunk(i,j)
-	var endTime = Time.get_unix_time_from_system()
-	var timeTaken = endTime - startTime
+	var endTime := Time.get_unix_time_from_system()
+	var timeTaken : float = endTime - startTime
 	print("generation took ",timeTaken, " seconds")
-
-func _process(delta):
-	deltaTime = delta
-	playerChunkPos = floor(%PLAYER.position/Vector2(chunkSize)/Vector2(tile_set.tile_size))
-	
-	var neighborChunks = GLOBAL.get_neighbors(playerChunkPos)
-	
-	for i in loadedChunks:
-		if not neighborChunks.has(i) and not reservedChunks.has(i) and updateChunks:
-			unloadChunk(i.x,i.y)
-	
-	for i in neighborChunks:
-		if not loadedChunks.has(i) and not reservedChunks.has(i) and updateChunks:
-			loadChunk(i.x,i.y)
-	
-	
-	if tickChunks: notify_runtime_tile_data_update()
-	pass
-
-func returnTileAlt(flipH: bool, flipV: bool, rotate: bool, randSeed: int = randi()):
-	var alt := 0
-	if rotate:
-		seed(randSeed)
-		match randi_range(0,3):
-			1: alt = TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_H
-			2: alt = TileSetAtlasSource.TRANSFORM_FLIP_H | TileSetAtlasSource.TRANSFORM_FLIP_V
-			3: alt = TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_V
-	seed(randSeed+1)
-	if flipH and randf() < 0.5: alt ^= TileSetAtlasSource.TRANSFORM_FLIP_H
-	seed(randSeed+2)
-	if flipV and randf() < 0.5: alt ^= TileSetAtlasSource.TRANSFORM_FLIP_V
-	
-	return alt
 
 func generate_layer_base(posX, posY):
 	
@@ -246,44 +179,6 @@ func generate_ores_noise(lastTargetTileType, posX, posY):
 			targetTileType = "conivium"
 	return targetTileType
 
-func generate_chunk(posX, posY):
-	if reservedChunks.has(Vector2i(posX,posY)):return
-	var chunkPosGlobal := Vector2i(posX*chunkSize.x, posY*chunkSize.y) 
-	
-	for x in range(chunkSize.x):
-		for y in range(chunkSize.y):
-			var currentTile := Vector2i(x,y)+chunkPosGlobal
-			
-			var targetTileType = generate_layer_base(currentTile.x,currentTile.y)
-			
-			targetTileType = generate_ores_noise(targetTileType,currentTile.x,currentTile.y)
-			
-			targetTileType = generate_caves(targetTileType,currentTile.x,currentTile.y)
-			
-			
-			
-			if targetTileType == "air":
-				set_cell(currentTile)
-			else:
-				set_cell(currentTile,
-					tileTypes[targetTileType].sourceID,
-					tileTypes[targetTileType].atlasCoords[0],
-					returnTileAlt(
-						tileTypes[targetTileType].altFlipH,
-						tileTypes[targetTileType].altFlipV,
-						tileTypes[targetTileType].altRotate
-						))
-			
-			
-			#region: place clusters
-			for clusterType in clusterTypes.values():
-				if clusterType.minDepth <= currentTile.y and currentTile.y <= clusterType.maxDepth and randf() < clusterType.chance:
-					place_cluster(currentTile, clusterType.tileName)
-			#endregion 
-
-	#generatedChunks.append(Vector2i(posX,posY))
-	loadedChunks.append(Vector2i(posX,posY))
-
 func place_cluster(start: Vector2i, clusterType: String):
 	var clusterTypeData = clusterTypes[clusterType]
 	
@@ -311,6 +206,219 @@ func place_cluster(start: Vector2i, clusterType: String):
 		
 		toProcess.shuffle()
 
+func generate_chunk(posX, posY):
+	if reservedChunks.has(Vector2i(posX,posY)):return
+	var chunkPosGlobal := Vector2i(posX*chunkSize.x, posY*chunkSize.y) 
+	
+	for x in range(chunkSize.x):
+		for y in range(chunkSize.y):
+			var currentTile := Vector2i(x,y)+chunkPosGlobal
+			
+			var targetTileType = generate_layer_base(currentTile.x,currentTile.y)
+			
+			targetTileType = generate_ores_noise(targetTileType,currentTile.x,currentTile.y)
+			
+			targetTileType = generate_caves(targetTileType,currentTile.x,currentTile.y)
+			
+			if targetTileType == "air":
+				set_cell(currentTile)
+			else:
+				set_cell(currentTile,
+					tileTypes[targetTileType].sourceID,
+					tileTypes[targetTileType].atlasCoords[0],
+					returnTileAlt(
+						tileTypes[targetTileType].altFlipH,
+						tileTypes[targetTileType].altFlipV,
+						tileTypes[targetTileType].altRotate
+						))
+			
+			
+			#region: place clusters
+			for clusterType in clusterTypes.values():
+				if clusterType.minDepth <= currentTile.y and currentTile.y <= clusterType.maxDepth and randf() < clusterType.chance:
+					place_cluster(currentTile, clusterType.tileName)
+			#endregion 
+
+	#generatedChunks.append(Vector2i(posX,posY))
+	loadedChunks.append(Vector2i(posX,posY))
+
+
+
+func digTile(tilePos: Vector2i):
+	if get_cell_atlas_coords(tilePos) == -Vector2i.ONE: return
+	var tileType = get_tile_type(tilePos)
+	
+	get_tile_attrib(tilePos,"health",tileType.hardness)
+	
+	tileAttrib[tilePos]["health"] -= 1
+
+func delete_tile(tilePos: Vector2i):
+	set_cell(tilePos)
+	$breakingVisualLayer.set_cell(tilePos)
+	tileAttrib.erase(tilePos)
+
+func _process(delta):
+	deltaTime = delta
+	playerChunkPos = floor(%PLAYER.position/Vector2(chunkSize)/Vector2(tile_set.tile_size))
+	
+	var neighborChunks = GLOBAL.get_neighbors(playerChunkPos)
+	
+	for i in loadedChunks:
+		if not neighborChunks.has(i) and not reservedChunks.has(i) and updateChunks:
+			unloadChunk(i.x,i.y)
+	
+	for i in neighborChunks:
+		if not loadedChunks.has(i) and not reservedChunks.has(i) and updateChunks:
+			loadChunk(i.x,i.y)
+	
+	tickingTiles = 0
+	if tickChunks: notify_runtime_tile_data_update()
+	if get_tree().get_frame() % 4 == 0:
+		update_lighting()
+
+func unloadChunk(posX: int, posY: int):
+	var tilesArray = []
+	var chunkPosGlobal := Vector2i(posX*chunkSize.x, posY*chunkSize.y) 
+	for x in range(chunkSize.x):
+		for y in range(chunkSize.y):
+			var currentTile := Vector2i(x,y)+chunkPosGlobal
+			var tileData := get_cell_tile_data(currentTile)
+			var tileTypeName := "air"
+			if tileData:
+				tileTypeName = tileData.get_custom_data("tileTypeName")
+			tilesArray.append(tileTypeName)
+			delete_tile(currentTile)
+	
+	cachedChunks[Vector2i(posX,posY)] = tilesArray
+	loadedChunks.erase(Vector2i(posX,posY))
+
+func loadChunk(posX: int, posY: int):
+	if not cachedChunks.has(Vector2i(posX,posY)):
+		generate_chunk(posX,posY)
+		return
+	var chunkState = cachedChunks[Vector2i(posX,posY)]
+	
+	var chunkPosGlobal := Vector2i(posX*chunkSize.x, posY*chunkSize.y) 
+	for x in range(chunkSize.x):
+		for y in range(chunkSize.y):
+			var currentTile := Vector2i(x,y)+chunkPosGlobal
+			var targetTileType : String = chunkState.pop_front()
+			
+			if targetTileType == "air":
+				set_cell(currentTile)
+			else:
+				set_cell(currentTile,
+					tileTypes[targetTileType].sourceID,
+					tileTypes[targetTileType].atlasCoords[0],
+					returnTileAlt(
+						tileTypes[targetTileType].altFlipH,
+						tileTypes[targetTileType].altFlipV,
+						tileTypes[targetTileType].altRotate
+						))
+						
+	cachedChunks.erase(Vector2i(posX,posY))
+	loadedChunks.append(Vector2i(posX,posY))
+
+func _use_tile_data_runtime_update(coords: Vector2i) -> bool:
+	if get_tile_type(coords).behavior:
+		if not coords in tileAttrib:
+			tileAttrib[coords] = {}
+	var thisTileRect : Rect2 = Rect2(map_to_local(coords)-Vector2(TILE_SIZE)/2, TILE_SIZE)
+	var viewportRect = %PLAYERCAM.get_viewport().get_visible_rect()
+	var viewportSize : Vector2 = viewportRect.end-viewportRect.position
+	var camRect : Rect2 = Rect2(%PLAYERCAM.get_screen_center_position()-viewportSize/2,viewportSize)
+	
+	var tick := tileAttrib.has(coords) or camRect.intersects(thisTileRect,true)
+	if tick: tickingTiles+=1
+	return tick 
+
+func _tile_data_runtime_update(coords: Vector2i, tile_data: TileData) -> void:
+	var tileType = get_tile_type(coords)
+	get_tile_attrib(coords,"health",tileType.hardness)
+	if tileType.behavior:
+		tileType.behavior._tick(coords,tile_data,tileAttrib[coords],deltaTime, %PLAYERCAM, self)
+	
+	if lightmap.has(coords):
+		tile_data.modulate *= lightmap[coords]
+	
+	if tileAttrib[coords]["health"] == 0:
+		delete_tile(coords)
+	else:
+		var breakSpriteSelect = 15 - floor( (tileAttrib[coords]["health"]-1.0) / (tileType.hardness-1.0) * 16.0 )
+		$breakingVisualLayer.set_cell(coords,1 if tileType.lightModeBreak else 0,Vector2i(breakSpriteSelect,0),returnTileAlt(true,true,true,coords.x*coords.y))
+
+func update_lighting():
+	print(get_tree().get_frame())
+	if !%PLAYER.playerTile:
+		print("playertile not found")
+		return
+	var sources = []
+	for chunk in loadedChunks:
+		var chunkPosGlobal := chunk * chunkSize
+		for x in range(chunkSize.x):
+			for y in range(chunkSize.y):
+				
+				var currentTile : Vector2i = Vector2i(x,y)+chunkPosGlobal 
+				var currentTileType = get_tile_type(currentTile)
+				var tileColor = Color.BLACK
+				if currentTileType.ambientLight:
+					get_tile_attrib(currentTile, "brightness", 0.0)
+					tileAttrib[currentTile]["lightColor"] = currentTileType.lightColor
+					tileAttrib[currentTile]["brightness"] = currentTileType.brightness
+				if tileAttrib.has(currentTile) and tileAttrib[currentTile].has("lightColor"):
+					tileColor = tileAttrib[currentTile]["lightColor"]
+				if tileColor != Color.BLACK:
+					sources.append({
+						"coords":currentTile,
+					})
+					
+				var d = abs(%PLAYER.global_position - map_to_local(currentTile))
+				var b = clamp(1-max(d.x,d.y)/(64*6),0,1)
+				lightmap[currentTile] = Color.BLACK
+				lightmap[currentTile] += Color(b,b,b)
+				
+	propagate_lighting(sources)
+	
+func propagate_lighting(sources : Array):
+	var processed = []
+	var queue = []
+	for source in sources:
+		queue.append({
+			"sourceCoords":source["coords"],
+			"coords":source["coords"],
+		})
+		
+	while !queue.is_empty():
+		var current = queue.pop_front()
+		var currentCoords = current["coords"]
+		var sourceCoords = current["sourceCoords"]
+		
+		var sourceTileType = get_tile_type(sourceCoords)
+		var d = abs(sourceCoords - currentCoords)
+		var distance = float(max(d.x,d.y))
+		var sourceColor = get_tile_attrib(sourceCoords,"lightColor",Color.BLACK)
+		var sourceeBrightness = get_tile_attrib(sourceCoords,"brightness",0.0)
+		var color = sourceColor * sourceColor.a * (1.0-distance/sourceeBrightness)
+
+		if processed.has(currentCoords) or str(sourceTileType) == "air" or color.get_luminance() < 0.05:
+			continue
+		
+		if !lightmap.has(currentCoords):
+			lightmap[currentCoords] = Color.BLACK
+		
+		lightmap[currentCoords] += color
+		
+		if get_tile_type(currentCoords).limitBrightness:
+			lightmap[currentCoords] = lightmap[currentCoords].clamp(Color.BLACK, Color.WHITE)
+		
+		processed.append(currentCoords)
+		for i in GLOBAL.get_adjacent(currentCoords):
+			var next = {
+			"sourceCoords":sourceCoords,
+			"coords":i
+			}
+			queue.append(next)
+
 func find_air_body(start: Vector2i, maxDistance: int):
 	var toVisit : Array[Vector2i] = [start]
 	var visited = []
@@ -328,14 +436,6 @@ func find_air_body(start: Vector2i, maxDistance: int):
 		
 	return visited
 
-func digTile(tilePos: Vector2i):
-	if get_cell_atlas_coords(tilePos) == -Vector2i.ONE: return
-	var tileType = get_tile_type(tilePos)
-	
-	get_tile_attrib(tilePos,"health",tileType.hardness)
-	
-	tileAttrib[tilePos]["health"] -= 1
-
 func get_tile_attrib(tilePos: Vector2i, attrib: String, default):
 	if not tilePos in tileAttrib:
 		tileAttrib[tilePos] = {}
@@ -350,11 +450,6 @@ func get_tile_type(coords: Vector2i) -> TileType:
 		tileTypeName = tileData.get_custom_data("tileTypeName")
 	return tileTypeDict.tileTypeDict[tileTypeName]
 
-func delete_tile(tilePos: Vector2i):
-	set_cell(tilePos)
-	$breakingVisualLayer.set_cell(tilePos)
-	tileAttrib.erase(tilePos)
-
 func is_tile_diggable(coords:Vector2i, playerCoords: Vector2i, range: int) -> bool:
 	var airBody = find_air_body(playerCoords, range)
 	var airBodyAdjacent = []
@@ -364,20 +459,17 @@ func is_tile_diggable(coords:Vector2i, playerCoords: Vector2i, range: int) -> bo
 	var distance = max((coords-playerCoords).abs().x, (coords-playerCoords).abs().y)
 	return airBodyAdjacent.has(coords) and distance <= range and str(get_tile_type(coords)) != "air"
 
-func _use_tile_data_runtime_update(coords: Vector2i) -> bool:
-	if get_tile_type(coords).behavior:
-		if not coords in tileAttrib:
-			tileAttrib[coords] = {}
-	return tileAttrib.has(coords)
-
-func _tile_data_runtime_update(coords: Vector2i, tile_data: TileData) -> void:
-	var tileType = get_tile_type(coords)
-	get_tile_attrib(coords,"health",tileType.hardness)
-	if tileType.behavior:
-		tileType.behavior._tick(coords,tile_data,tileAttrib[coords],deltaTime, %PLAYERCAM, self)
-		
-	if tileAttrib[coords]["health"] == 0:
-		delete_tile(coords)
-	else:
-		var breakSpriteSelect = 15 - floor( (tileAttrib[coords]["health"]-1.0) / (tileType.hardness-1.0) * 16.0 )
-		$breakingVisualLayer.set_cell(coords,1 if tileType.lightModeBreak else 0,Vector2i(breakSpriteSelect,0),returnTileAlt(true,true,true,coords.x*coords.y))
+func returnTileAlt(flipH: bool, flipV: bool, rotate: bool, randSeed: int = randi()):
+	var alt := 0
+	if rotate:
+		seed(randSeed)
+		match randi_range(0,3):
+			1: alt = TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_H
+			2: alt = TileSetAtlasSource.TRANSFORM_FLIP_H | TileSetAtlasSource.TRANSFORM_FLIP_V
+			3: alt = TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_V
+	seed(randSeed+1)
+	if flipH and randf() < 0.5: alt ^= TileSetAtlasSource.TRANSFORM_FLIP_H
+	seed(randSeed+2)
+	if flipV and randf() < 0.5: alt ^= TileSetAtlasSource.TRANSFORM_FLIP_V
+	
+	return alt

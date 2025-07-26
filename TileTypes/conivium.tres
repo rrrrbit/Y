@@ -1,12 +1,16 @@
 [gd_resource type="Resource" script_class="TileType" load_steps=3 format=3 uid="uid://bjvcai0s0xq3d"]
 
-[ext_resource type="Script" uid="uid://b6hldwfwv5a5n" path="res://Tiles/Behaviors/conivium.gd" id="1_q3q8e"]
-[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://Tiles/TileType.gd" id="2_vr0fd"]
+[ext_resource type="Script" uid="uid://b6hldwfwv5a5n" path="res://TileTypes/Behaviors/conivium.gd" id="1_q3q8e"]
+[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://TileTypes/TileType.gd" id="2_vr0fd"]
 
 [resource]
 script = ExtResource("2_vr0fd")
 tileName = "conivium"
 hardness = 10
+limitBrightness = true
+ambientLight = false
+lightColor = Color(0, 0, 0, 1)
+brightness = 0.0
 atlasCoords = Array[Vector2i]([Vector2i(5, 1)])
 sourceID = 0
 altFlipH = true

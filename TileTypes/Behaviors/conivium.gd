@@ -1,6 +1,7 @@
 extends TileBehavior
 
 const TILE_SIZE = Vector2(64,64)
+const TILE_COLOR = Color("7a09fa")
 func _tick(coords, tileData: TileData, tileAttribs, delta, cam: Camera2D, tilemap: TileMapLayer):
 	
 	if not tileAttribs.has("seen"):
@@ -17,7 +18,10 @@ func _tick(coords, tileData: TileData, tileAttribs, delta, cam: Camera2D, tilema
 		tileAttribs["health"] = 10.0
 		tileAttribs["colorDarkness"] = move_toward(tileAttribs["colorDarkness"], 0.2, 1*delta)
 		tileData.modulate.v = tileAttribs["colorDarkness"]
+		
 	else:
-		tileAttribs["colorDarkness"] = 1.0
+		tileAttribs["colorDarkness"] = move_toward(tileAttribs["colorDarkness"], 1.0, 1*delta)
 		tileData.modulate = Color.WHITE
+	tileAttribs["lightColor"] = TILE_COLOR * tileAttribs["colorDarkness"] * 1.5
+	tileAttribs["brightness"] = tileAttribs["colorDarkness"] * 6
 	

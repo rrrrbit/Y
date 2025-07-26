@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cxp7nk47iqyhg"
-path="res://.godot/imported/breaking.png-f7475aa4c2e2721d0622090bb335ab61.ctex"
+uid="uid://dclmwm58mnoux"
+path="res://.godot/imported/tileSelect.png-2381425376974781cf37d3488d028cfc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://breaking.png"
-dest_files=["res://.godot/imported/breaking.png-f7475aa4c2e2721d0622090bb335ab61.ctex"]
+source_file="res://Sprites/tileSelect.png"
+dest_files=["res://.godot/imported/tileSelect.png-2381425376974781cf37d3488d028cfc.ctex"]
 
 [params]
 

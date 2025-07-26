@@ -1,12 +1,14 @@
 [gd_resource type="Resource" script_class="TileType" load_steps=3 format=3 uid="uid://dl575bsh0c1sd"]
 
-[ext_resource type="Script" uid="uid://cignrhagxmy62" path="res://Tiles/Behaviors/iaomite.gd" id="1_e8lv0"]
-[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://Tiles/TileType.gd" id="2_e8lv0"]
+[ext_resource type="Script" uid="uid://cignrhagxmy62" path="res://TileTypes/Behaviors/iaomite.gd" id="1_e8lv0"]
+[ext_resource type="Script" uid="uid://dj2v3pkgeft60" path="res://TileTypes/TileType.gd" id="2_e8lv0"]
 
 [resource]
 script = ExtResource("2_e8lv0")
 tileName = "iaomite"
 hardness = 8
+enableLight = false
+limitBrightness = true
 atlasCoords = Array[Vector2i]([Vector2i(4, 1)])
 sourceID = 0
 altFlipH = true

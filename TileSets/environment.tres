@@ -1,6 +1,6 @@
 [gd_resource type="TileSet" load_steps=3 format=3 uid="uid://bh6u1u2xa8i8b"]
 
-[ext_resource type="Texture2D" uid="uid://duryiyw8y6iyb" path="res://environment.svg" id="1_2urvg"]
+[ext_resource type="Texture2D" uid="uid://duryiyw8y6iyb" path="res://Sprites/environment.svg" id="1_2urvg"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ej02t"]
 resource_name = "environment"

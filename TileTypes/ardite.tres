@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="ClusterType" load_steps=2 format=3 uid="uid://btmb2f1465jti"]
 
-[ext_resource type="Script" uid="uid://benhk3c04kgw4" path="res://Scripts/ClusterType.gd" id="1_2vdw4"]
+[ext_resource type="Script" uid="uid://benhk3c04kgw4" path="res://TileTypes/ClusterType.gd" id="1_pdrfp"]
 
 [resource]
-script = ExtResource("1_2vdw4")
+script = ExtResource("1_pdrfp")
 chance = 0.005
 minDepth = 8
 maxDepth = 250
@@ -11,10 +11,14 @@ minSize = 1
 maxSize = 10
 tileName = "ardite"
 hardness = 3
+limitBrightness = false
+ambientLight = true
+lightColor = Color(0.929412, 0.462745, 0.0784314, 1)
+brightness = 2.0
 atlasCoords = Array[Vector2i]([Vector2i(2, 1)])
 sourceID = 0
 altFlipH = true
 altFlipV = true
-altRotate = true
+altRotate = false
 lightModeBreak = false
 metadata/_custom_type_script = "uid://dj2v3pkgeft60"

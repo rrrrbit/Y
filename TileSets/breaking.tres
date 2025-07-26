@@ -1,7 +1,7 @@
 [gd_resource type="TileSet" load_steps=5 format=3 uid="uid://bpykuxvvnx386"]
 
-[ext_resource type="Texture2D" uid="uid://cxp7nk47iqyhg" path="res://breaking.png" id="1_1mhcx"]
-[ext_resource type="Texture2D" uid="uid://uyfn5bfvjxjp" path="res://breakingLight.png" id="2_okiol"]
+[ext_resource type="Texture2D" uid="uid://cxp7nk47iqyhg" path="res://Sprites/breaking.png" id="1_1mhcx"]
+[ext_resource type="Texture2D" uid="uid://uyfn5bfvjxjp" path="res://Sprites/breakingLight.png" id="2_okiol"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_okiol"]
 resource_name = "breaking"

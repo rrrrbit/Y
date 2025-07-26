@@ -5,9 +5,9 @@ const GRAV = 2000.0
 const MAXSPEED = 300.0
 const JUMP_VELOCITY = -550.0
 
-var digRange := 3
+var digRange := 10
 
-var digInterval = 0.25
+var digInterval = 0.3
 var digTimer = 0
 
 var selectedTile : Vector2i

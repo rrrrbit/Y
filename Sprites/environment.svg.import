@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8evx451f6wuo"
-path="res://.godot/imported/breakingDebug.svg-7d729ad3dc481d8f7173f5086bbec0f4.ctex"
+uid="uid://duryiyw8y6iyb"
+path="res://.godot/imported/environment.svg-0ac3ac18498cb40ac7011a9186376080.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://breakingDebug.svg"
-dest_files=["res://.godot/imported/breakingDebug.svg-7d729ad3dc481d8f7173f5086bbec0f4.ctex"]
+source_file="res://Sprites/environment.svg"
+dest_files=["res://.godot/imported/environment.svg-0ac3ac18498cb40ac7011a9186376080.ctex"]
 
 [params]
 
