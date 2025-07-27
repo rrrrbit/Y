@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://y3k0afdehs17"]
+[gd_scene load_steps=3 format=3 uid="uid://y3k0afdehs17"]
 
 [ext_resource type="Script" uid="uid://beemj6pommvqb" path="res://Scripts/MENU_main.gd" id="1_peo84"]
+[ext_resource type="Texture2D" uid="uid://cj6xs18ikfeit" path="res://Sprites/Y.svg" id="2_5cw3e"]
 
 [node name="root" type="Control"]
 layout_mode = 3
@@ -14,10 +15,10 @@ script = ExtResource("1_peo84")
 [node name="btn_play" type="Button" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 830.0
-offset_top = 491.0
-offset_right = 983.0
-offset_bottom = 598.0
+offset_left = 514.0
+offset_top = 620.0
+offset_right = 667.0
+offset_bottom = 727.0
 theme_override_font_sizes/font_size = 72
 text = "play
 "
@@ -25,20 +26,20 @@ text = "play
 [node name="btn_options" type="Button" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 754.0
-offset_top = 622.0
-offset_right = 1036.0
-offset_bottom = 729.0
+offset_left = 515.0
+offset_top = 743.0
+offset_right = 797.0
+offset_bottom = 850.0
 theme_override_font_sizes/font_size = 72
 text = "settings"
 
 [node name="btn_quit" type="Button" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 828.0
-offset_top = 756.0
-offset_right = 981.0
-offset_bottom = 863.0
+offset_left = 516.0
+offset_top = 863.0
+offset_right = 669.0
+offset_bottom = 970.0
 theme_override_font_sizes/font_size = 72
 text = "quit"
 
@@ -59,6 +60,14 @@ grow_vertical = 0
 theme_override_font_sizes/normal_font_size = 72
 text = "loading:"
 fit_content = true
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 133.0
+offset_top = -99.0
+offset_right = 420.0
+offset_bottom = 1112.0
+texture = ExtResource("2_5cw3e")
 
 [connection signal="pressed" from="btn_play" to="." method="_on_btn_play_pressed"]
 [connection signal="pressed" from="btn_options" to="." method="_on_btn_options_pressed"]

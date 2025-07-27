@@ -15,6 +15,9 @@ var selectedTile : Vector2i
 var playerTile
 
 func _process(delta):
+	if !velocity.is_zero_approx():
+		%WORLD.lightingDirty = true
+	
 	playerTile = %WORLD.local_to_map(position)
 	
 	selectedTile = %WORLD.local_to_map(get_global_mouse_position())

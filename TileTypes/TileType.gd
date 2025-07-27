@@ -3,7 +3,7 @@ class_name TileType
 
 @export var tileName := "tile name"
 @export var hardness := 1
-@export var limitBrightness := false
+@export var isLightSource := false
 @export var ambientLight := false
 @export var lightColor := Color.BLACK
 @export var brightness := 0.0

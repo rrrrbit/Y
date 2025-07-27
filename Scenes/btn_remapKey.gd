@@ -14,7 +14,7 @@ func _ready():
 func _toggled(toggled_on):
 	set_process_unhandled_input(toggled_on)
 	if toggled_on:
-		text = "..."
+		text = "dig: ..."
 		
 func _unhandled_input(event):
 	if event.is_pressed():
@@ -27,7 +27,7 @@ func _unhandled_input(event):
 		$"..".save_keymap()
 		
 func update_text():
-	text = InputMap.action_get_events(action)[0].as_text()
+	text = "dig: "+InputMap.action_get_events(action)[0].as_text()
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass

@@ -7,7 +7,8 @@
 script = ExtResource("2_vr0fd")
 tileName = "conivium"
 hardness = 10
-limitBrightness = true
+isLightSource = true
+colorLighting = false
 ambientLight = false
 lightColor = Color(0, 0, 0, 1)
 brightness = 0.0

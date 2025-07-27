@@ -7,8 +7,11 @@
 script = ExtResource("2_e8lv0")
 tileName = "iaomite"
 hardness = 8
-enableLight = false
-limitBrightness = true
+isLightSource = true
+colorLighting = false
+ambientLight = false
+lightColor = Color(0, 0, 0, 1)
+brightness = 0.0
 atlasCoords = Array[Vector2i]([Vector2i(4, 1)])
 sourceID = 0
 altFlipH = true

@@ -11,7 +11,7 @@ extends TileMapLayer
 
 var tickingTiles := 0
 
-var lightmap: Dictionary[Vector2i,Color]
+var lightmap : Dictionary[Vector2i,Color]
 
 var clusterTypes : Dictionary[String,ClusterType]
 
@@ -28,6 +28,8 @@ var loadedChunks : Array[Vector2i]
 
 var cachedChunks : Dictionary[Vector2i,Array]
 
+var cachedSourceLightmaps = {}
+
 @export var reservedChunks : Array[Vector2i]
 @export var initialGenerate : Rect2i
 const LAYER_TRANSITION_WIDTH = [
@@ -40,7 +42,12 @@ const LAYER_TRANSITION_WIDTH = [
 
 var LTW = LAYER_TRANSITION_WIDTH
 
+var lightTickSpeed := 1/48.0
+var lightTickTimer := 0.0
 
+var lightingDirty = false
+
+var camRect : Rect2
 const CAVE_DEPTH = 50
 
 const LAYER_BOUNDARIES = [
@@ -54,10 +61,15 @@ const LAYER_BOUNDARIES = [
 var playerChunkPos: Vector2i
 
 func _ready():
+	var test :Texture2D
+	
 	getClusterTypes()
 	initGen()
 	for i in reservedChunks:
 		loadedChunks.append(i)
+		
+	await GLOBAL.Wait(0.2)
+	lightingDirty = true
 
 func getClusterTypes():
 	for tileType in tileTypes.keys():
@@ -76,6 +88,8 @@ func initGen():
 	var endTime := Time.get_unix_time_from_system()
 	var timeTaken : float = endTime - startTime
 	print("generation took ",timeTaken, " seconds")
+	
+	
 
 func generate_layer_base(posX, posY):
 	
@@ -258,6 +272,11 @@ func delete_tile(tilePos: Vector2i):
 	tileAttrib.erase(tilePos)
 
 func _process(delta):
+	
+	var viewportRect = %PLAYERCAM.get_viewport().get_visible_rect()
+	var viewportSize : Vector2 = viewportRect.end-viewportRect.position
+	camRect = Rect2(%PLAYERCAM.get_screen_center_position()-viewportSize/2,viewportSize)
+	
 	deltaTime = delta
 	playerChunkPos = floor(%PLAYER.position/Vector2(chunkSize)/Vector2(tile_set.tile_size))
 	
@@ -273,8 +292,12 @@ func _process(delta):
 	
 	tickingTiles = 0
 	if tickChunks: notify_runtime_tile_data_update()
-	if get_tree().get_frame() % 4 == 0:
+	
+	tickBehavior(delta)
+	
+	if lightingDirty:
 		update_lighting()
+		lightingDirty = false
 
 func unloadChunk(posX: int, posY: int):
 	var tilesArray = []
@@ -320,104 +343,113 @@ func loadChunk(posX: int, posY: int):
 	loadedChunks.append(Vector2i(posX,posY))
 
 func _use_tile_data_runtime_update(coords: Vector2i) -> bool:
-	if get_tile_type(coords).behavior:
-		if not coords in tileAttrib:
-			tileAttrib[coords] = {}
-	var thisTileRect : Rect2 = Rect2(map_to_local(coords)-Vector2(TILE_SIZE)/2, TILE_SIZE)
-	var viewportRect = %PLAYERCAM.get_viewport().get_visible_rect()
-	var viewportSize : Vector2 = viewportRect.end-viewportRect.position
-	var camRect : Rect2 = Rect2(%PLAYERCAM.get_screen_center_position()-viewportSize/2,viewportSize)
-	
-	var tick := tileAttrib.has(coords) or camRect.intersects(thisTileRect,true)
-	if tick: tickingTiles+=1
-	return tick 
+	return camRect.intersects(Rect2(map_to_local(coords)-Vector2(TILE_SIZE)/2, TILE_SIZE),true) 
 
 func _tile_data_runtime_update(coords: Vector2i, tile_data: TileData) -> void:
 	var tileType = get_tile_type(coords)
-	get_tile_attrib(coords,"health",tileType.hardness)
-	if tileType.behavior:
-		tileType.behavior._tick(coords,tile_data,tileAttrib[coords],deltaTime, %PLAYERCAM, self)
+	var mod = Color.WHITE
+	if tileAttrib.has(coords):
+		mod = tileAttrib[coords].get("modulate", Color.WHITE)
+	tile_data.modulate = mod * lightmap.get(coords,Color.WHITE)
 	
-	if lightmap.has(coords):
-		tile_data.modulate *= lightmap[coords]
-	
-	if tileAttrib[coords]["health"] == 0:
+	var h = tileType.hardness
+	if tileAttrib.has(coords):
+		h = tileAttrib[coords].get("health",h)
+	if h <= 0:
 		delete_tile(coords)
+		lightingDirty = true
 	else:
-		var breakSpriteSelect = 15 - floor( (tileAttrib[coords]["health"]-1.0) / (tileType.hardness-1.0) * 16.0 )
+		var breakSpriteSelect = 15 - floor( (h-1.0) / (tileType.hardness-1.0) * 16.0 )
 		$breakingVisualLayer.set_cell(coords,1 if tileType.lightModeBreak else 0,Vector2i(breakSpriteSelect,0),returnTileAlt(true,true,true,coords.x*coords.y))
 
-func update_lighting():
-	print(get_tree().get_frame())
-	if !%PLAYER.playerTile:
-		print("playertile not found")
-		return
-	var sources = []
+func tickBehavior(delta):
 	for chunk in loadedChunks:
 		var chunkPosGlobal := chunk * chunkSize
 		for x in range(chunkSize.x):
 			for y in range(chunkSize.y):
-				
 				var currentTile : Vector2i = Vector2i(x,y)+chunkPosGlobal 
 				var currentTileType = get_tile_type(currentTile)
-				var tileColor = Color.BLACK
-				if currentTileType.ambientLight:
-					get_tile_attrib(currentTile, "brightness", 0.0)
-					tileAttrib[currentTile]["lightColor"] = currentTileType.lightColor
-					tileAttrib[currentTile]["brightness"] = currentTileType.brightness
-				if tileAttrib.has(currentTile) and tileAttrib[currentTile].has("lightColor"):
-					tileColor = tileAttrib[currentTile]["lightColor"]
-				if tileColor != Color.BLACK:
-					sources.append({
-						"coords":currentTile,
-					})
-					
+				if !currentTileType.behavior:
+					continue
+				get_tile_attrib(currentTile,"health",currentTileType.hardness)
+				currentTileType.behavior._tick(currentTile,tileAttrib[currentTile],delta, %PLAYERCAM, self)
+
+func update_lighting():
+	if !%PLAYER.playerTile:
+		return
+	var sources := {}
+	
+	for chunk in loadedChunks:
+		var chunkPosGlobal := chunk * chunkSize
+		for x in range(chunkSize.x):
+			for y in range(chunkSize.y):
+				var currentTile : Vector2i = Vector2i(x,y)+chunkPosGlobal
+				if not camRect.intersects(Rect2(map_to_local(currentTile)-Vector2(TILE_SIZE)/2, TILE_SIZE),true):
+					continue
+				
 				var d = abs(%PLAYER.global_position - map_to_local(currentTile))
 				var b = clamp(1-max(d.x,d.y)/(64*6),0,1)
-				lightmap[currentTile] = Color.BLACK
-				lightmap[currentTile] += Color(b,b,b)
+				lightmap[currentTile] = Color.BLACK + Color(b,b,b)
 				
-	propagate_lighting(sources)
-	
-func propagate_lighting(sources : Array):
-	var processed = []
-	var queue = []
+	for chunk in loadedChunks:
+		var chunkPosGlobal := chunk * chunkSize
+		for x in range(chunkSize.x):
+			for y in range(chunkSize.y):
+				var currentTile : Vector2i = Vector2i(x,y)+chunkPosGlobal
+				var currentTileType = get_tile_type(currentTile)
+				
+				if not currentTileType.isLightSource: continue
+				
+				var tileBrightness = get_tile_attrib(currentTile, "brightness", 0.0)
+				var tileLightColor = get_tile_attrib(currentTile, "lightColor", Color.BLACK)
+				
+				if currentTileType.ambientLight:
+					tileAttrib[currentTile]["brightness"] = currentTileType.brightness
+					tileAttrib[currentTile]["lightColor"] = currentTileType.lightColor
+					
+				if tileLightColor != Color.BLACK and tileBrightness > 0.0:
+					sources[currentTile] = [tileLightColor, tileBrightness]
+				
 	for source in sources:
-		queue.append({
-			"sourceCoords":source["coords"],
-			"coords":source["coords"],
-		})
-		
-	while !queue.is_empty():
-		var current = queue.pop_front()
-		var currentCoords = current["coords"]
-		var sourceCoords = current["sourceCoords"]
-		
-		var sourceTileType = get_tile_type(sourceCoords)
-		var d = abs(sourceCoords - currentCoords)
-		var distance = float(max(d.x,d.y))
-		var sourceColor = get_tile_attrib(sourceCoords,"lightColor",Color.BLACK)
-		var sourceeBrightness = get_tile_attrib(sourceCoords,"brightness",0.0)
-		var color = sourceColor * sourceColor.a * (1.0-distance/sourceeBrightness)
+		var sourceLightmap = source_lightmap(source, sources[source][0], sources[source][1])
+		for i in sourceLightmap:
+			lightmap[i] = lightBlend(lightmap.get(i, Color.BLACK), sourceLightmap[i])
 
-		if processed.has(currentCoords) or str(sourceTileType) == "air" or color.get_luminance() < 0.05:
+func lightBlend(a : Color, b : Color) -> Color:
+	if a.v+b.v == 0: return Color.BLACK
+	var w = ((a*a.v+b*b.v)/(a.v+b.v))
+	return Color.from_hsv(
+		w.h,
+		w.s,
+		max(a.v,b.v)
+	)
+
+func source_lightmap(source, color, brightness):
+	var processed = {}
+	var queue : Array[Vector2i] = [source]
+	var sourceTileType := get_tile_type(source)
+	var thisLightmap : Dictionary[Vector2i,Color] = {}
+	while !queue.is_empty():
+		var current : Vector2i = queue.pop_front()
+		
+		var d : Vector2i = abs(source - current)
+		var distance : int = max(d.x,d.y)
+		
+		var thisColor : Color = color * (1.0-distance/brightness)
+
+		if (
+			processed.has(current) or 
+			thisColor.get_luminance() < 0.05 or
+			str(get_tile_type(current)) == "air"
+			):
 			continue
+			
+		thisLightmap[current] = thisColor
 		
-		if !lightmap.has(currentCoords):
-			lightmap[currentCoords] = Color.BLACK
-		
-		lightmap[currentCoords] += color
-		
-		if get_tile_type(currentCoords).limitBrightness:
-			lightmap[currentCoords] = lightmap[currentCoords].clamp(Color.BLACK, Color.WHITE)
-		
-		processed.append(currentCoords)
-		for i in GLOBAL.get_adjacent(currentCoords):
-			var next = {
-			"sourceCoords":sourceCoords,
-			"coords":i
-			}
-			queue.append(next)
+		processed[current] = true
+		for i in GLOBAL.get_adjacent(current):
+			queue.append(i)
+	return thisLightmap
 
 func find_air_body(start: Vector2i, maxDistance: int):
 	var toVisit : Array[Vector2i] = [start]
